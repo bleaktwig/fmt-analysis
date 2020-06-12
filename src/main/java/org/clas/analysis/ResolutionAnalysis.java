@@ -218,7 +218,8 @@ public class ResolutionAnalysis {
                             }
 
                             // Plot other types of analysis
-                            dgFMT[plti].getH1F("hi_cluster_res_l"+(li+1)).fill(res*(10*costh));
+                            // dgFMT[plti].getH1F("hi_cluster_res_l"+(li+1)).fill(res*(10*costh));
+                            dgFMT[plti].getH1F("hi_cluster_res_l"+(li+1)).fill(res);
                             if (func==0 || func==1)
                                 dgFMT[plti].getH2F("hi_cluster_res_strip_l"+(li+1))
                                         .fill(res, strip);
