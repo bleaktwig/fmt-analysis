@@ -110,9 +110,6 @@ public class ResolutionAnalysis {
         // Sanitize input.
         if (func<0 || func>4) return 1;
 
-        // Get constants.
-        Constants constants = new Constants();
-
         // Print the shifts applied.
         if (debugInfo) {
             System.out.printf("SHIFTS APPLIED:\n");
@@ -138,7 +135,7 @@ public class ResolutionAnalysis {
             DataEvent event = reader.getNextEvent();
             ei++;
 
-            ArrayList<TrajPoint[]> trajPoints = TrajPoint.getTrajPoints(event, constants, swim,
+            ArrayList<TrajPoint[]> trajPoints = TrajPoint.getTrajPoints(event, swim,
                     fcuts, fmtZ, fmtAngle, shArr, 3, true);
             ArrayList<Cluster>[] clusters = Cluster.getClusters(event, fcuts, true);
             if (trajPoints==null || clusters==null) continue;
@@ -332,7 +329,7 @@ public class ResolutionAnalysis {
             System.out.printf("\b\b]\n");
         }
 
-        // Data.drawResPlots(dgFMT, cn, titleArr, pltLArr);
+        Data.drawResPlots(dgFMT, cn, titleArr, pltLArr);
 
         return 0;
     }
@@ -427,8 +424,6 @@ public class ResolutionAnalysis {
         // Sanitize input.
         if (var < 0 || var > 5) return 0;
 
-        Constants constants = new Constants();
-
         String title = null;
         if (var == 0) title = "Tmin count";
         if (var == 1) title = "energy count";
@@ -483,7 +478,7 @@ public class ResolutionAnalysis {
                 }
             }
             if (var==4) {
-                ArrayList<TrajPoint[]> trajPoints = TrajPoint.getTrajPoints(event, constants,
+                ArrayList<TrajPoint[]> trajPoints = TrajPoint.getTrajPoints(event,
                         swim, fcuts, fmtZ, fmtAngle, shArr, 3, false);
                 if (trajPoints==null) continue;
                 for (TrajPoint[] trjparr : trajPoints) {
@@ -493,7 +488,7 @@ public class ResolutionAnalysis {
                 }
             }
             if (var==3) {
-                ArrayList<TrajPoint[]> trajPoints = TrajPoint.getTrajPoints(event, constants, swim,
+                ArrayList<TrajPoint[]> trajPoints = TrajPoint.getTrajPoints(event, swim,
                         fcuts, fmtZ, fmtAngle, shArr, 3, true);
                 ArrayList<Cluster>[] clusters = Cluster.getClusters(event, fcuts, true);
                 if (trajPoints==null || clusters==null) continue;
