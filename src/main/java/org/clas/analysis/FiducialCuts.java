@@ -72,10 +72,10 @@ public class FiducialCuts {
             trsc[3]++;
             return true;
         }
-        if (costh>0.4) {
-            trsc[4]++;
-            return true;
-        }
+//        if (costh>0.4) {
+//            trsc[4]++;
+//            return true;
+//        }
 
         return false;
     }
@@ -102,10 +102,10 @@ public class FiducialCuts {
             clsc[3]++;
             return true;
         }
-        if (size >= 5) {
-            clsc[4]++;
-            return true;
-        }
+//        if (size >= 5) {
+//            clsc[4]++;
+//            return true;
+//        }
 
         return false;
     }

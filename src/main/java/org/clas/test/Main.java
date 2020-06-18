@@ -49,8 +49,8 @@ public class Main {
 //                { 0.00, 0.00, 0.00, 0.00, 0.00, 0.00}
 //        };
 
-        // NOTE: Due to the fact that the y axis is pointing up, the yaw is inverted from common
-        //       aviation standards!
+        // NOTE: Due to the fact that the y axis is pointing up, the yaw direction is inverted from
+        //       common aviation standards!
 
         // Apply pitch and yaw shifts.
         FiducialCuts fCuts = new FiducialCuts();
