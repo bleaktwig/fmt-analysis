@@ -22,3 +22,5 @@ The Main class of the program is `org.clas.test.Main`, and is where you should a
 To run the different types of analysis, simply uncomment the one you need to run, compile and run.
 This is by no means a clean way to use the program, but due to the way Netbeans works it is the quickest one by far.
 The explanation for all the methods in the ResolutionAnalysis class are in the JavaDoc and as comments in the class itself, so it shouldn't be hard to get everything set up and running.
+
+NOTE: Due to the hasty implementation, it is a bit awkward to read xy and pitch & yaw alignment results. This should be fixed at some point in time, but it's not an urgent task.

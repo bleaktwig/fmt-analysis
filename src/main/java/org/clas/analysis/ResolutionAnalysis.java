@@ -15,33 +15,41 @@ import org.clas.cross.TrajPoint;
 
 public class ResolutionAnalysis {
     // Class variables:
-    String infile;
-    boolean[] pltLArr;
-    boolean debugInfo;
-    boolean testRun;
-    double[] fmtZ;     // z position of the layers in cm (before shifting).
-    double[] fmtAngle; // strip angle in deg.
-    double[][] shArr;  // 2D array of shifts to be applied.
-    boolean makeCrosses = false; // Boolean describing if we should do crossmaking.
+    private String infile;
+    private boolean[] pltLArr;
+    private boolean debugInfo;
+    private boolean testRun;
+    private double[] fmtZ;       // z position of the layers in cm (before shifting).
+    private double[] fmtAngle;   // strip angle in deg degrees.
+    private double[][] shArr;    // 2D array of shifts to be applied.
+    private boolean makeCrosses; // Boolean describing if we should do crossmaking.
+    private boolean drawPlots;   // Boolean describing if plots are to be drawn.
+    private boolean ypAlign;     // Special setup needed for yaw & pitch alignment.
 
     /**
      * Class constructor.
-     * @param infile   Input hipo file.
-     * @param pltLArr  Boolean array describing what lines should be drawn in each plot:
-     *                   * [0] : Top plots, vertical line at 0.
-     *                   * [1] : Bottom plots, vertical line at 0.
-     *                   * [2] : Bottom plots, horizontal lines at each cable's endpoint.
-     *                   * [3] : Bottom plots, horizonal lines separating each "region" of the FMT.
-     * @param dbgInfo  Boolean describing if debugging info should be printed.
-     * @param testRun  Boolean describing if the run should be cut short for expedient testing.
-     * @param shiftArr Array of arrays describing all the shifts applied:
-     *                   [0]:  global [z,x,y,phi] shift.
-     *                   [1]: layer 1 [z,x,y,phi] shift.
-     *                   [2]: layer 2 [z,x,y,phi] shift.
-     *                   [3]: layer 3 [z,x,y,phi] shift.
+     * @param infile      Input hipo file.
+     * @param pltLArr     Boolean array describing what lines should be drawn in each plot:
+     *                      * [0] : Top plots, vertical line at 0.
+     *                      * [1] : Bottom plots, vertical line at 0.
+     *                      * [2] : Bottom plots, horizontal lines at each cable's endpoint.
+     *                      * [3] : Bottom plots, horizonal lines separating each FMT "region".
+     * @param dbgInfo     Boolean describing if debugging info should be printed.
+     * @param testRun     Boolean describing if the run should be cut short for expedient testing.
+     * @param shiftArr    Array of arrays describing all the shifts applied:
+     *                      * [0]:  global [z,x,y,phi] shift.
+     *                      * [1]: layer 1 [z,x,y,phi] shift.
+     *                      * [2]: layer 2 [z,x,y,phi] shift.
+     *                      * [3]: layer 3 [z,x,y,phi] shift.
+     * @param makeCrosses Boolean describing if we should do crossmaking.
+     * @param drawPlots   Boolean describing if plots are to be drawn.
+     * @param ypAlign     Special setup needed for yaw & pitch alignment.
      */
-    public ResolutionAnalysis(String infile, boolean[] pltLArr,
-            boolean dbgInfo, boolean testRun, double[][] shArr) {
+    public ResolutionAnalysis(String infile, boolean[] pltLArr, boolean dbgInfo, boolean testRun,
+            double[][] shArr, boolean makeCrosses, boolean drawPlots, boolean ypAlign) {
+        this.makeCrosses = makeCrosses;
+        this.drawPlots   = drawPlots;
+        this.ypAlign     = ypAlign;
 
         // Sanitize input.
         if (pltLArr.length != 4) {
@@ -130,7 +138,7 @@ public class ResolutionAnalysis {
 
         // Loop through events.
         while (reader.hasEvent()) {
-            if (testRun && ei == 250) break;
+            if (testRun && ei == 50) break;
             if (ei%50000==0) System.out.format("Analyzed %8d events...\n", ei);
             DataEvent event = reader.getNextEvent();
             ei++;
@@ -215,8 +223,14 @@ public class ResolutionAnalysis {
                             }
 
                             // Plot other types of analysis
-                            dgFMT[plti].getH1F("hi_cluster_res_l"+(li+1)).fill(res, Math.pow(costh, -1));
-                            // dgFMT[plti].getH1F("hi_cluster_res_l"+(li+1)).fill(res);
+                            double theta_inv = 1/Math.toDegrees(Math.acos(costh));
+                            if (ypAlign) {
+                                if (!Double.isFinite(theta_inv)) continue;
+                                dgFMT[plti].getH1F("hi_cluster_res_l"+(li+1)).fill(res, theta_inv);
+                            }
+                            else {
+                                dgFMT[plti].getH1F("hi_cluster_res_l"+(li+1)).fill(res);
+                            }
                             if (func==0 || func==1)
                                 dgFMT[plti].getH2F("hi_cluster_res_strip_l"+(li+1))
                                         .fill(res, strip);
@@ -328,8 +342,7 @@ public class ResolutionAnalysis {
             for (int ci=0; ci<cn; ++ci) System.out.printf("%9.2f, ", chiSqArr[li][ci]);
             System.out.printf("\b\b]\n");
         }
-
-        Data.drawResPlots(dgFMT, cn, titleArr, pltLArr);
+        if (drawPlots) Data.drawResPlots(dgFMT, cn, titleArr, pltLArr);
 
         return 0;
     }
@@ -350,7 +363,7 @@ public class ResolutionAnalysis {
         // Run.
         DataGroup[] dgFMT = Data.createResDataGroups(func, Constants.getNumberOfFMTLayers(), Constants.getNumberOfDCSectors(), r);
         runAnalysis(func, Constants.getNumberOfDCSectors(), swim, fcuts, dgFMT, g);
-        Data.drawResPlots(dgFMT, Constants.getNumberOfDCSectors(), titleArr, pltLArr);
+        if (drawPlots) Data.drawResPlots(dgFMT, Constants.getNumberOfDCSectors(), titleArr, pltLArr);
 
         return 0;
     }
@@ -371,7 +384,7 @@ public class ResolutionAnalysis {
         // Run.
         DataGroup[] dgFMT = Data.createResDataGroups(func, Constants.getNumberOfFMTLayers(), Constants.getNumberOfDCSectors(), r);
         runAnalysis(func, Constants.getNumberOfDCSectors(), swim, fcuts, dgFMT, g);
-        Data.drawResPlots(dgFMT, Constants.getNumberOfDCSectors(), titleArr, pltLArr);
+        if (drawPlots) Data.drawResPlots(dgFMT, Constants.getNumberOfDCSectors(), titleArr, pltLArr);
 
         return 0;
     }
@@ -392,7 +405,7 @@ public class ResolutionAnalysis {
         // Run.
         runAnalysis(func, swim, fcuts, dgFMT);
         if (debugInfo) fcuts.printCutsInfo();
-        Data.drawPlots(dgFMT, title);
+        if (drawPlots) Data.drawPlots(dgFMT, title);
 
         return 0;
     }
@@ -404,7 +417,7 @@ public class ResolutionAnalysis {
 
         // Run.
         runAnalysis(func, swim, fcuts, dgFMT);
-        Data.drawPlots(dgFMT, title);
+        if (drawPlots) Data.drawPlots(dgFMT, title);
 
         return 0;
     }
@@ -506,17 +519,17 @@ public class ResolutionAnalysis {
         System.out.format("Analyzed %8d events... Done!\n", ei);
         reader.close();
 
-        if (var==0 || var==1 || var==4) Data.drawPlots(dgFMT, title);
+        if ((var==0 || var==1 || var==4) && drawPlots) Data.drawPlots(dgFMT, title);
         if (var==2) {
             // Apply z shifts and draw plots.
             for (int li = 0; li< Constants.getNumberOfFMTLayers(); ++li) fmtZ[li] += shArr[0][0] + shArr[li+1][0];
-            Data.drawZPlots(dgFMT, title, fmtZ);
+            if (drawPlots) Data.drawZPlots(dgFMT, title, fmtZ);
         }
         if (var==3) {
             // Fit gaussian and draw plots.
             for (int i=0; i<2; ++i)
                 Data.fitRes(dgFMT[0].getH1F("delta_tmin"+i), dgFMT[0].getF1D("f"+i), 40);
-            Data.drawPlots(dgFMT, title);
+            if (drawPlots) Data.drawPlots(dgFMT, title);
         }
 
         return 0;
@@ -569,7 +582,7 @@ public class ResolutionAnalysis {
         System.out.format("Analyzed %8d events... Done!\n", ei);
         reader.close();
 
-        Data.drawPlots(dgFMT, title);
+        if (drawPlots) Data.drawPlots(dgFMT, title);
 
         return 0;
     }

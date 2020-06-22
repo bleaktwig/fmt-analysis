@@ -6,6 +6,9 @@ import java.util.Arrays;
 
 public class FiducialCuts {
 
+    // general setup:
+    boolean ypAlign = false;
+
     // physics-wise cuts:
     private static final double maxDeltaZ = 0.05;
     private static final double maxPzOverP = 0.4;
@@ -22,7 +25,10 @@ public class FiducialCuts {
     int[] clsc = new int[5]; // cut clusters counter.
     int[] crsc = new int[3]; // cut crosses counter.
 
-    public FiducialCuts() {
+    public FiducialCuts() {}
+
+    public FiducialCuts(boolean ypAlign) {
+        this.ypAlign = ypAlign;
     }
 
     /**
@@ -79,7 +85,7 @@ public class FiducialCuts {
      * @return true if the track is to be cut, false otherwise.
      */
     public boolean checkTrajCuts(double z, double x, double y, double zRef, double costh) {
-        if (Math.abs(z - zRef) > maxDeltaZ) {
+        if (!ypAlign && Math.abs(z - zRef) > maxDeltaZ) {
             trsc[2]++;
             return true;
         }
@@ -87,10 +93,10 @@ public class FiducialCuts {
             trsc[3]++;
             return true;
         }
-        // if (costh > maxPzOverP) {
-        //     trsc[4]++;
-        //     return true;
-        // }
+        if (!ypAlign && costh > maxPzOverP) {
+            trsc[4]++;
+            return true;
+        }
         return false;
     }
 
@@ -116,10 +122,10 @@ public class FiducialCuts {
             clsc[3]++;
             return true;
         }
-        // if (size >= 5) {
-        //     clsc[4]++;
-        //     return true;
-        // }
+        if (!ypAlign && size >= 5) {
+            clsc[4]++;
+            return true;
+        }
         return false;
     }
 
