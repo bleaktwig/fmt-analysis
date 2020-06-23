@@ -3,7 +3,6 @@ package org.clas.test;
 import org.clas.analysis.TrkSwim;
 import org.clas.analysis.FiducialCuts;
 import org.clas.analysis.ResolutionAnalysis;
-//import java.io.PrintStream;
 
 public class Main {
     /** Print usage. */
@@ -28,11 +27,11 @@ public class Main {
         int pltRan           = 10;    // Plotting range.
         int gssRan           = 8;     // Fitting range.
         boolean dbgInfo      = true;  // Show debugging info.
-        boolean testRun      = true; // Shorten run for testing.
+        boolean testRun      = false; // Shorten run for testing.
         boolean dataType     = false; // false for detector data, true for gemc simulation data.
         boolean analysisType = false; // false for alignment, true for plotting variables.
         boolean makeCrosses  = false; // Boolean describing if we should do crossmaking.
-        boolean drawPlots    = false; // Boolean describing if plots are to be drawn. Due to hasty
+        boolean drawPlots    = true;  // Boolean describing if plots are to be drawn. Due to hasty
                                       // implementation, can't be set to true for xy and pitch & yaw
                                       // alignment.
 
@@ -58,8 +57,7 @@ public class Main {
                     { 0.00, 0.00, 0.00, 0.00, 0.00, 0.00}  // Layer 3 shifts
             };
         }
-
-        FiducialCuts fCuts = new FiducialCuts();
+        FiducialCuts fCuts = new FiducialCuts(makeCrosses);
         TrkSwim swim = new TrkSwim(swmSetup, shArr[0][4], shArr[0][5]);
 
         // === Alignment ===========================================================================
@@ -123,7 +121,7 @@ public class Main {
                         {-0.05, -0.04, -0.03, -0.02, -0.01, 0.00, 0.01, 0.02, 0.03, 0.04, 0.05};
 
                 // Run:
-                fCuts = new FiducialCuts(true);
+                fCuts.setYPAlign(true);
                 double orig_yaw = shArr[0][4];
                 for (int yi = 0; yi<yawShArr.length; ++yi) {
                     shArr[0][4] = orig_yaw + yawShArr[yi];
