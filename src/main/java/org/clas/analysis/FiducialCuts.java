@@ -1,12 +1,12 @@
 package org.clas.analysis;
 
-import org.clas.cross.Constants;
-
 import java.util.Arrays;
+import org.clas.cross.Constants;
 
 public class FiducialCuts {
 
     // general setup:
+    boolean makeCrosses = false;
     boolean ypAlign = false;
 
     // physics-wise cuts:
@@ -27,7 +27,11 @@ public class FiducialCuts {
 
     public FiducialCuts() {}
 
-    public FiducialCuts(boolean ypAlign) {
+    public FiducialCuts(boolean makeCrosses) {
+        this.makeCrosses = makeCrosses;
+    }
+
+    public void setYPAlign(boolean ypAlign) {
         this.ypAlign = ypAlign;
     }
 
@@ -89,7 +93,7 @@ public class FiducialCuts {
             trsc[2]++;
             return true;
         }
-        if (Constants.getInnerRadius() > (x * x + y * y) || (x * x + y * y) > Constants.getOuterRadius()) {
+        if (Constants.getInnerRadius() > (x*x + y*y) || (x*x + y*y) > Constants.getOuterRadius()) {
             trsc[3]++;
             return true;
         }
@@ -194,15 +198,19 @@ public class FiducialCuts {
                 clscsum, clsc[0]);
         System.out.printf("                               %% │ %5.2f%%              │\n",
                 100 * ((double) clscsum) / clsc[0]);
-        System.out.printf("─────────────────────────────────┼─────────────────────┤\n");
-        System.out.printf(" cluster y too distant to traj y | %8d (%5.2f%%)   |\n",
-                crsc[2], 100 * ((double) crsc[1]) / crsc[0]);
-        System.out.printf("   clusters with large tmin diff | %8d (%5.2f%%)   |\n",
-                crsc[2], 100 * ((double) crsc[2]) / crsc[0]);
-        System.out.printf("           TOTAL CROSSES DROPPED | %8d / %8d |\n",
-                crscsum, crsc[0]);
-        System.out.printf("                               %% | %5.2f%%              │\n",
-                100 * ((double) crscsum) / crsc[0]);
-        System.out.printf("─────────────────────────────────┴─────────────────────┘\n");
+        if (makeCrosses) {
+            System.out.printf("─────────────────────────────────┼─────────────────────┤\n");
+            System.out.printf(" cluster y too distant to traj y | %8d (%5.2f%%)   |\n",
+                    crsc[2], 100 * ((double) crsc[1]) / crsc[0]);
+            System.out.printf("   clusters with large tmin diff | %8d (%5.2f%%)   |\n",
+                    crsc[2], 100 * ((double) crsc[2]) / crsc[0]);
+            System.out.printf("           TOTAL CROSSES DROPPED | %8d / %8d |\n",
+                    crscsum, crsc[0]);
+            System.out.printf("                               %% | %5.2f%%              │\n",
+                    100 * ((double) crscsum) / crsc[0]);
+            System.out.printf("─────────────────────────────────┴─────────────────────┘\n");
+        }
+        else
+            System.out.printf("─────────────────────────────────┴─────────────────────┘\n");
     }
 }
